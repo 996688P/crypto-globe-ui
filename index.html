@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>crypto-globe-ui — 星空 · 地球 · 玻璃币 · 小行星</title>
+<meta name="description" content="自托管的加密风 3D 视觉层: 程序化星空 + 数字地球 + 六边形玻璃币球 + 环绕小行星玻璃币, 带载入页特效. Three.js / WebGL, 纯装饰.">
+<link rel="stylesheet" href="assets/globe.css">
+</head>
+<body class="earth-loading">
+
+  <!-- 载入页特效: 全屏启动遮罩 (de-branded) -->
+  <div id="cgBoot" role="status" aria-live="polite">
+    <div class="cgb-orb">
+      <div class="cgb-ring"></div>
+      <div class="cgb-core"></div>
+      <div class="cgb-orbit"><i></i></div>
+    </div>
+    <div class="cgb-t">CRYPTO-GLOBE</div>
+    <div class="cgb-s">STARFIELD · DIGITAL EARTH · GLASS COINS</div>
+    <div class="cgb-bar"></div>
+  </div>
+
+  <!-- 背景天幕: 星空 + 地球 + 玻璃币球 -->
+  <div class="earth-bg" id="earthBg" aria-hidden="true">
+    <div id="aiEarth"></div>
+    <div class="coin-tag-layer" id="coinTagLayer"></div>
+    <div class="hq-skel" id="hqSkel"><div class="hs-ring"></div><div class="hs-txt">INITIALIZING GLOBE</div></div>
+    <div class="hq-stage-vignette"></div>
+  </div>
+
+  <!-- 演示说明层(非视觉核心) -->
+  <div class="demo-caption">
+    <div class="dc-t">星空 · 数字地球 · 玻璃币</div>
+    <div class="dc-s">Three.js / WebGL — pure visual layer, no data</div>
+  </div>
+
+  <!-- 依赖 -->
+  <script src="vendor/three.min.js"></script>
+  <script src="vendor/postproc/Pass.js"></script>
+  <script src="vendor/postproc/MaskPass.js"></script>
+  <script src="vendor/postproc/CopyShader.js"></script>
+  <script src="vendor/postproc/LuminosityHighPassShader.js"></script>
+  <script src="vendor/postproc/ShaderPass.js"></script>
+  <script src="vendor/postproc/RenderPass.js"></script>
+  <script src="vendor/postproc/EffectComposer.js"></script>
+  <script src="vendor/postproc/UnrealBloomPass.js"></script>
+  <script src="vendor/postproc/GammaCorrectionShader.js"></script>
+  <script src="vendor/anime.min.js"></script>
+  <!-- 辉光后处理(包装 WebGLRenderer, fail-open) -->
+  <script src="assets/postfx.js"></script>
+  <!-- 视觉核心 -->
+  <script src="assets/globe.js"></script>
+  <!-- 环绕小行星玻璃币层 (逐帧由 globe.js tick 驱动 __cgAsteroidFrame) -->
+  <script src="assets/asteroid.js"></script>
+  <!-- 环绕粒子层 (币种节点 + 邻近连线 + 区块脉冲, 纯装饰 canvas) -->
+  <script src="assets/particles.js"></script>
+  <!-- 免费公开行情接入 (CoinGecko + Binance, no key, fail-open) -->
+  <script src="assets/market-feed.js"></script>
+
+  <script>
+    // 载入骨架淡出 + 载入页特效淡出
+    (function(){
+      var sk = document.getElementById('hqSkel');
+      var boot = document.getElementById('cgBoot');
+      function rm(){ if(boot && boot.parentNode) boot.parentNode.removeChild(boot); }
+      function hide(){
+        if(sk) sk.classList.add('done');
+        if(boot){ boot.classList.add('cg-boot-off'); setTimeout(rm, 850); }
+      }
+      // 数据/地球就绪 → 立即收尾
+      try{ window.addEventListener('hw:earth-ready', hide, { once:true }); }catch(e){}
+      window.addEventListener('load', function(){ setTimeout(hide, 700); });
+      setTimeout(hide, 4000); // 兜底
+      // 淡出动画结束即移除 DOM
+      if(boot) boot.addEventListener('animationend', function(ev){ if(ev.animationName==='cgBootOut') rm(); });
+    })();
+  </script>
+</body>
+</html>
